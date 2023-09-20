@@ -1,28 +1,27 @@
 package io.mongonq;
 
 import io.mongonq.query.QueryBuilderUtil;
-
-import com.mongodb.BasicDBObject;
+import org.bson.BsonDocument;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.DeleteResult;
 
 public class Remove {
-	private final MongoCollection<BasicDBObject> mongoCollection;
-	private final String jsonQuery;
+	private final MongoCollection<BsonDocument> mongoCollection;
+	private final BsonDocument jsonQuery;
 	private boolean isSingleDoc;
 
-	public Remove(MongoCollection<BasicDBObject> mongoCollection, String query, Object... parameters) {
+	public Remove(MongoCollection<BsonDocument> mongoCollection, String query, Object... parameters) {
 		this.mongoCollection = mongoCollection;
-		this.jsonQuery = QueryBuilderUtil.createQuery(query, parameters);
+		this.jsonQuery = QueryBuilderUtil.buildQueryDBObject(query, parameters);
 	}
 
 	public WriteResult remove() {
-		BasicDBObject filter = BasicDBObject.parse(jsonQuery);
+		
 		DeleteResult removeResult = null;
 		if (isSingleDoc) {
-			removeResult = mongoCollection.deleteOne(filter);
+			removeResult = mongoCollection.deleteOne(jsonQuery);
 		} else {
-			removeResult = mongoCollection.deleteMany(filter);
+			removeResult = mongoCollection.deleteMany(jsonQuery);
 		}
 		if (removeResult.getDeletedCount() > 0) {
 			return new WriteResult(1, removeResult.wasAcknowledged(), removeResult.getDeletedCount());
@@ -37,3 +36,4 @@ public class Remove {
 	}
 
 }
+

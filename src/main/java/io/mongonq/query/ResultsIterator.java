@@ -2,17 +2,19 @@ package io.mongonq.query;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.bson.BsonDocument;
 
 /**
- *The ResultsIterator is the results from an operation, such as a query.
+ * The ResultsIterator is the results from an operation, such as a query.
  *
  * @param <E> The type that this iterable will decode documents to.
- * @since 3.0
+ * @since 1.0
  */
+
 public class ResultsIterator<E> implements Iterator<E>, Iterable<E>, Closeable {
 
 	private Iterator<BsonDocument> results;
@@ -42,10 +44,6 @@ public class ResultsIterator<E> implements Iterator<E>, Iterable<E>, Closeable {
 		return QueryBuilderUtil.mapToPojo(document, clazz);
 	}
 
-	public void remove() {
-		throw new UnsupportedOperationException("remove() method is not supported");
-	}
-
 	@Override
 	public void close() throws IOException {
 		if (results instanceof Closeable) {
@@ -54,8 +52,18 @@ public class ResultsIterator<E> implements Iterator<E>, Iterable<E>, Closeable {
 		}
 	}
 
+	public void remove() {
+		throw new UnsupportedOperationException("remove() method is not supported");
+	}
+
 	boolean isCursor() {
 		return true;
+	}
 
+	public int count() {
+		if (iterator() instanceof Collection<?>) {
+			return ((Collection<?>) iterator()).size();
+		}
+		return 0;
 	}
 }

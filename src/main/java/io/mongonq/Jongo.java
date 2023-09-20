@@ -1,12 +1,14 @@
 package io.mongonq;
 
-import com.mongodb.BasicDBObject;
+import org.bson.BsonDocument;
 import com.mongodb.client.MongoDatabase;
 
 /**
- * @author Susant Kumar
  * 
- * */
+ * @author Susant Kumar
+ * @since 1.0
+ * 
+ **/
 public class Jongo {
 	private final MongoDatabase database;
 
@@ -15,7 +17,7 @@ public class Jongo {
 	}
 
 	public MongoCollection getCollection(String mongoCollection) {
-		return new MongoCollection(database.getCollection(mongoCollection, BasicDBObject.class));
+		return new MongoCollection(database.getCollection(mongoCollection, BsonDocument.class));
 	}
 
 	public MongoDatabase getDatabase() {

@@ -3,29 +3,27 @@ package io.mongonq;
 import org.bson.BsonDocument;
 import io.mongonq.query.QueryBuilderUtil;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 
 public class FindOne {
-	private final MongoCollection<BasicDBObject> mongoCollection;
-	private final String jsonQuery;
-	private String projectJsonQuery = "{}";
+	private final MongoCollection<BsonDocument> mongoCollection;
+	private final BsonDocument jsonQuery;
+	private BsonDocument projectJsonQuery = new BsonDocument();
 
-	public FindOne(MongoCollection<BasicDBObject> mongoCollection, String query, Object... parameters) {
+	public FindOne(MongoCollection<BsonDocument> mongoCollection, String query, Object... parameters) {
 		this.mongoCollection = mongoCollection;
-		this.jsonQuery = QueryBuilderUtil.createQuery(query, parameters);
+		this.jsonQuery = QueryBuilderUtil.buildQueryDBObject(query, parameters);
 	}
 
 	public FindOne projection(String sortQuery, Object... params) {
-		projectJsonQuery = QueryBuilderUtil.createQuery(sortQuery, params);
+		projectJsonQuery = QueryBuilderUtil.buildQueryDBObject(sortQuery, params);
 		return this;
 	}
 
 	public <T> T as(final Class<T> clazz) {
-		BasicDBObject filter = BasicDBObject.parse(jsonQuery);
-		BasicDBObject project = BasicDBObject.parse(projectJsonQuery);
+		BsonDocument result = mongoCollection.find(jsonQuery, BsonDocument.class).projection(projectJsonQuery).first();
+		return result != null ? QueryBuilderUtil.mapToPojo(result, clazz)
+				: QueryBuilderUtil.mapToPojo(new BsonDocument(), clazz);
 
-		BsonDocument result = mongoCollection.find(filter, BsonDocument.class).projection(project).first();
-		return result == null ? null : QueryBuilderUtil.mapToPojo(result, clazz);
 	}
 }

@@ -1,10 +1,13 @@
 package io.mongonq;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.BsonDocument;
+import org.bson.conversions.Bson;
 import io.mongonq.query.QueryBuilderUtil;
 import io.mongonq.query.ResultsIterator;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 

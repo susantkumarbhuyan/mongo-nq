@@ -11,7 +11,7 @@ public class WriteResult {
 		acknowledged = false;
 		upsertedId = null;
 	}
-
+	
 	public WriteResult(int n, boolean acknowledged, Object upsertedId) {
 		this.n = n;
 		this.acknowledged = acknowledged;
@@ -54,5 +54,4 @@ public class WriteResult {
 	public void setUpsertedId(Object upsertedId) {
 		this.upsertedId = upsertedId;
 	}
-
 }

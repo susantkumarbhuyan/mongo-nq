@@ -4,17 +4,16 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import io.mongonq.query.QueryBuilderUtil;
 
-import com.mongodb.BasicDBObject;
+import org.bson.BsonDocument;
 import com.mongodb.client.model.IndexOptions;
 
 public class MongoCollection {
-	public static final String MONGO_DOCUMENT_ID_NAME = "_id";
-	public static final String MONGO_QUERY_OID = "$oid";
+	private static final String MONGO_DOCUMENT_ID_NAME = "_id";
 	private static final Object[] NO_PARAMETERS = {};
 	private static final String ALL = "{}";
-	private final com.mongodb.client.MongoCollection<BasicDBObject> mongoCollection;
+	private final com.mongodb.client.MongoCollection<BsonDocument> mongoCollection;
 
-	public MongoCollection(com.mongodb.client.MongoCollection<BasicDBObject> mongoCollection) {
+	public MongoCollection(com.mongodb.client.MongoCollection<BsonDocument> mongoCollection) {
 		this.mongoCollection = mongoCollection;
 	}
 
@@ -63,8 +62,7 @@ public class MongoCollection {
 	}
 
 	public long count(String query, Object... parameters) {
-		String jsonQuery = QueryBuilderUtil.createQuery(query, parameters);
-		BasicDBObject filter = BasicDBObject.parse(jsonQuery);
+		BsonDocument filter =  QueryBuilderUtil.buildQueryDBObject(query, parameters);
 		return mongoCollection.countDocuments(filter);
 	}
 
@@ -115,7 +113,6 @@ public class MongoCollection {
 		return new Remove(mongoCollection, query, parameters).remove();
 	}
 
-	@Deprecated()
 	public Distinct distinct(String key) {
 		return new Distinct(mongoCollection, key);
 	}

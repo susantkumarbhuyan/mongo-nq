@@ -1,9 +1,8 @@
 package io.mongonq;
 
-import org.bson.BsonDocument;
 import io.mongonq.query.QueryBuilderUtil;
 
-import com.mongodb.BasicDBObject;
+import org.bson.BsonDocument;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 
