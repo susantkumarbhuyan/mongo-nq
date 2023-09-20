@@ -1,9 +1,5 @@
 package io.mongonq;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoCollection;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +7,10 @@ import java.util.List;
 
 import org.bson.BsonDocument;
 import io.mongonq.query.QueryBuilderUtil;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.MongoCollection;
 
 public class Distinct {
 	private final MongoCollection<BsonDocument> mongoCollection;

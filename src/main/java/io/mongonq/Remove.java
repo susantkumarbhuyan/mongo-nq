@@ -1,7 +1,8 @@
 package io.mongonq;
 
-import io.mongonq.query.QueryBuilderUtil;
 import org.bson.BsonDocument;
+import io.mongonq.query.QueryBuilderUtil;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.DeleteResult;
 
@@ -36,4 +37,3 @@ public class Remove {
 	}
 
 }
-

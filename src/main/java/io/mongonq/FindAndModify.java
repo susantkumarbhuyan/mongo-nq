@@ -1,37 +1,38 @@
 package io.mongonq;
 
+import org.bson.BsonDocument;
 import io.mongonq.query.QueryBuilderUtil;
 
-import org.bson.BsonDocument;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 
 public class FindAndModify {
-	private final MongoCollection<BasicDBObject> mongoCollection;
-	private final String jsonQuery;
+	private final MongoCollection<BsonDocument> mongoCollection;
+	private final BsonDocument jsonQuery;
 	private boolean isUpsert;
 	private boolean isRemove;
+	private BsonDocument jsonUpdateQuery;
 
-	public FindAndModify(MongoCollection<BasicDBObject> mongoCollection, String query, Object... parameters) {
+	public FindAndModify(MongoCollection<BsonDocument> mongoCollection, String query, Object... parameters) {
 		this.mongoCollection = mongoCollection;
-		this.jsonQuery = QueryBuilderUtil.createQuery(query, parameters);
+		this.jsonQuery = QueryBuilderUtil.buildQueryDBObject(query, parameters);
 	}
 
 	public FindAndModify with(String query, Object... parameters) {
-		String jsonUpdateQuery = QueryBuilderUtil.createQuery(query, parameters);
-		BasicDBObject filter = BasicDBObject.parse(jsonQuery);
-		BasicDBObject update = BasicDBObject.parse(jsonUpdateQuery);
-		mongoCollection.findOneAndUpdate(filter, update, new FindOneAndUpdateOptions().upsert(isUpsert));
+		jsonUpdateQuery = QueryBuilderUtil.buildQueryDBObject(query, parameters);
 		return this;
 	}
 
 	public <T> T as(final Class<T> clazz) {
-		BasicDBObject filter = BasicDBObject.parse(jsonQuery);
-		BsonDocument result = mongoCollection.find(filter, BsonDocument.class).first();
+
+		BsonDocument result = new BsonDocument();
 		if (isRemove) {
-			mongoCollection.findOneAndDelete(filter);
+			result = mongoCollection.findOneAndDelete(jsonQuery);
+		} else {
+			result = mongoCollection.findOneAndUpdate(jsonQuery, jsonUpdateQuery,
+					new FindOneAndUpdateOptions().upsert(isUpsert));
 		}
-		return result == null ? null : QueryBuilderUtil.mapToPojo(result, clazz);
+		return QueryBuilderUtil.mapToPojo(result.toBsonDocument(), clazz);
 	}
 
 	public FindAndModify upsert() {

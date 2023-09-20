@@ -1,10 +1,10 @@
 package io.mongonq;
 
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import io.mongonq.query.QueryBuilderUtil;
 
-import org.bson.BsonDocument;
 import com.mongodb.client.model.IndexOptions;
 
 public class MongoCollection {

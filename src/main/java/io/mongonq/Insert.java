@@ -5,6 +5,7 @@ import java.util.List;
 import org.bson.BsonDocument;
 import io.mongonq.query.QueryBuilderUtil;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.InsertManyResult;
@@ -20,11 +21,11 @@ public class Insert {
 
 	public WriteResult save(Object pojo) {
 		String jsonString = QueryBuilderUtil.convertObjectToJsonString(pojo);
-		BsonDocument document = BsonDocument.parse(jsonString);
+		BasicDBObject document = BasicDBObject.parse(jsonString);
 		if (document.containsKey("_id")) {
-			document = new BsonDocument().append("_id", document.getString("_id"));
+			document = new BasicDBObject().append("_id", document.getString("_id"));
 		}
-		BsonDocument insert = new BsonDocument();
+		BasicDBObject insert = new BasicDBObject();
 		insert.append("$set", document);
 		UpdateResult updateResult = mongoCollection.updateOne(document, insert, new UpdateOptions().upsert(true));
 		if (updateResult.wasAcknowledged()) {
@@ -55,4 +56,5 @@ public class Insert {
 		}
 		return result;
 	}
+
 }

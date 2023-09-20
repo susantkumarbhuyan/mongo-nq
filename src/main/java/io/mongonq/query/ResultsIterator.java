@@ -8,13 +8,6 @@ import java.util.NoSuchElementException;
 
 import org.bson.BsonDocument;
 
-/**
- * The ResultsIterator is the results from an operation, such as a query.
- *
- * @param <E> The type that this iterable will decode documents to.
- * @since 1.0
- */
-
 public class ResultsIterator<E> implements Iterator<E>, Iterable<E>, Closeable {
 
 	private Iterator<BsonDocument> results;

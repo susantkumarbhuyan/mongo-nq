@@ -7,13 +7,10 @@ import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import io.mongonq.query.QueryBuilderUtil;
 import io.mongonq.query.ResultsIterator;
+
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 
-/**
- * @author susant
- *
- */
 public class Aggregate {
 	private final MongoCollection<BsonDocument> mongoCollection;
 	private List<Bson> operations = new ArrayList<>();

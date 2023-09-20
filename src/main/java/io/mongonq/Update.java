@@ -1,8 +1,8 @@
 package io.mongonq;
 
+import org.bson.BsonDocument;
 import io.mongonq.query.QueryBuilderUtil;
 
-import org.bson.BsonDocument;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
@@ -50,4 +50,5 @@ public class Update {
 		this.multi = true;
 		return this;
 	}
+
 }

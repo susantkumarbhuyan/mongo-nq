@@ -12,100 +12,60 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
 public class Find {
-	private final MongoCollection<BasicDBObject> mongoCollection;
-	private final String jsonQuery;
-	private String sortJsonQuery = "{}";
-	private String projectJsonQuery = "{}";
-	private boolean isSort;
-	private boolean isProjection;
-	private boolean isSkip;
-	private boolean isLimit;
-	private int skipFrom;
-	private int limitSize;
-	private boolean isMin;
-	private String minJsonQuery;
-	private String maxJsonQuery;
-	private boolean isMax;
+	private final MongoCollection<BsonDocument> mongoCollection;
+	private final Bson jsonQuery;
+	private final List<QueryModifier> modifiers;
 
-	public Find(MongoCollection<BasicDBObject> mongoCollection, String query, Object... parameters) {
+	public Find(MongoCollection<BsonDocument> mongoCollection, String query, Object... parameters) {
 		this.mongoCollection = mongoCollection;
-		this.jsonQuery = QueryBuilderUtil.createQuery(query, parameters);
-	}
-
-	public Find sort(String sortQuery, Object... params) {
-		isSort = true;
-		sortJsonQuery = QueryBuilderUtil.createQuery(sortQuery, params);
-		return this;
-	}
-
-	public Find projection(String sortQuery, Object... params) {
-		isProjection = true;
-		projectJsonQuery = QueryBuilderUtil.createQuery(sortQuery, params);
-		return this;
-	}
-
-	/**
-	 * @param minQuery
-	 * @param params
-	 * @return
-	 */
-	public Find min(String minQuery, Object... params) {
-		isMin = true;
-		minJsonQuery = QueryBuilderUtil.createQuery(minQuery, params);
-		return this;
-	}
-
-	public Find max(String maxQuery, Object... params) {
-		isMax = true;
-		maxJsonQuery = QueryBuilderUtil.createQuery(maxQuery, params);
-		return this;
+		this.jsonQuery = QueryBuilderUtil.buildQueryDBObject(query, parameters);
+		this.modifiers = new ArrayList<>();
 	}
 
 	public <T> ResultsIterator<T> as(final Class<T> clazz) {
-		BasicDBObject filter = BasicDBObject.parse(jsonQuery);
-		FindIterable<BsonDocument> find = mongoCollection.find(filter, BsonDocument.class);
 
-		if (isProjection) {
-			BasicDBObject project = BasicDBObject.parse(projectJsonQuery);
-			find = find.projection(project);
-		}
-		if (isSort) {
-			BasicDBObject sort = BasicDBObject.parse(sortJsonQuery);
-			find = find.sort(sort);
-		}
-		if (isSkip) {
-			find = find.skip(skipFrom);
-		}
-		if (isLimit) {
-			find = find.limit(limitSize);
-		}
-		if (isMin) {
-			BasicDBObject minObj = BasicDBObject.parse(minJsonQuery);
-			find.min(minObj);
-		}
-		if (isMax) {
-			BasicDBObject maxObj = BasicDBObject.parse(maxJsonQuery);
-			find.max(maxObj);
-		}
+		FindIterable<BsonDocument> find = mongoCollection.find(jsonQuery, BsonDocument.class);
+		modifiers.forEach(modifier -> modifier.modify(find));
 
 		return new ResultsIterator<T>(find.iterator(), clazz);
 
 	}
 
-	/**
-	 * @param from
-	 * @return this
-	 */
-	public Find skip(int from) {
-		skipFrom = from;
-		isSkip = true;
+	public Find projection(String sortQuery, Object... params) {
+		Bson project = QueryBuilderUtil.buildQueryDBObject(sortQuery, params);
+		this.modifiers.add(find -> find.projection(project));
 		return this;
 	}
 
-	public Find limit(int size) {
-		limitSize = size;
-		isLimit = true;
+	public Find skip(final int skipFrom) {
+		this.modifiers.add(find -> find.skip(skipFrom));
 		return this;
 	}
 
+	public Find limit(final int limitSize) {
+		this.modifiers.add(find -> find.limit(limitSize));
+		return this;
+	}
+
+	public Find sort(String sort) {
+		final Bson sortDBObject = BsonDocument.parse(sort);
+		this.modifiers.add(find -> find.sort(sortDBObject));
+		return this;
+	}
+
+	public Find min(String minQuery, Object... params) {
+		final Bson minObj = QueryBuilderUtil.buildQueryDBObject(minQuery, params);
+		this.modifiers.add(find -> find.min(minObj));
+		return this;
+	}
+
+	public Find max(String maxQuery, Object... params) {
+		final Bson maxObj = QueryBuilderUtil.buildQueryDBObject(maxQuery, params);
+		this.modifiers.add(find -> find.max(maxObj));
+		return this;
+	}
+}
+
+interface QueryModifier {
+	void modify(FindIterable<BsonDocument> find);
 }

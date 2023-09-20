@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bson.BsonDocument;
 import org.bson.json.JsonWriterSettings;
-import org.json.JSONArray;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -35,10 +34,9 @@ public class QueryBuilderUtil {
 	public static List<BsonDocument> buildQueryDBObjectList(String query, Object... parameters) {
 		try {
 			String jsonQuery = queryFormater(query, parameters);
-			String jsonObjectArrayStr = new JSONArray(jsonQuery).toString();
 			ObjectMapper objectMapper = new ObjectMapper()
 					.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-			String respData = objectMapper.writeValueAsString(jsonObjectArrayStr);
+			String respData = objectMapper.writeValueAsString(jsonQuery);
 			return new ObjectMapper().readValue(respData, new TypeReference<List<BsonDocument>>() {
 			});
 		} catch (Exception e) {
